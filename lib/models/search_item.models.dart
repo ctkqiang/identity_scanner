@@ -59,7 +59,6 @@ class SearchItem {
     };
   }
 
-  /// Parse the JSON date format to DateTime - no more messy date strings! 📅
   DateTime? get parsedDateOfAP => _parseJsonDate(dateOfAP);
   DateTime? get parsedDateOfResult => _parseJsonDate(dateOfResult);
 
