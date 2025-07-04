@@ -422,21 +422,37 @@ class _SearchPageState extends State<SearchPage>
                         ),
                       ],
 
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 100),
+
                       // 底部提示信息
                       Container(
                         padding: const EdgeInsets.symmetric(vertical: 8),
-                        child: Row(
+                        child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: const [
-                            Icon(
-                              Icons.copyright,
-                              size: 16,
-                              color: Colors.indigo,
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.copyright,
+                                  size: 16,
+                                  color: Colors.indigo,
+                                ),
+                                SizedBox(width: 4),
+                                Text(
+                                  '2025 Malaysian eJugement | Built by ctkqiang',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.indigo,
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
                             ),
                             SizedBox(width: 4),
                             Text(
-                              '2025 电子判决搜索系统 | 由钟智强开发',
+                              'This app is built dedicated to Malaysian Court with ❤️',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.indigo,

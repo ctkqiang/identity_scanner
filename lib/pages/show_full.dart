@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:html/parser.dart' show parse;
 
 class ShowFullPage extends StatefulWidget {
   final String caseNo;
@@ -23,10 +24,33 @@ class ShowFullPage extends StatefulWidget {
 
 class _ShowFullPageState extends State<ShowFullPage>
     with SingleTickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late Animation<double> _fadeAnimation;
+  late final AnimationController _fadeController;
+  late final Animation<double> _fadeAnimation;
   double _textScale = 1.0;
   bool _isBookmarked = false;
+
+  String stripHtmlTags(String htmlString) {
+    return parse(htmlString).documentElement?.text.trim() ?? '';
+  }
+
+  String cleanPartiesF(String text) {
+    final pattern = RegExp(
+      r'(PLAINTIF|DEFENDAN|PERAYU|RESPONDEN|PEMOHON)(.*?)(?=PLAINTIF|DEFENDAN|PERAYU|RESPONDEN|PEMOHON|$)',
+      caseSensitive: false,
+    );
+
+    final buffer = StringBuffer();
+
+    for (final match in pattern.allMatches(text)) {
+      final role = match.group(1)?.toUpperCase();
+      final name = match.group(2)?.trim();
+      if (role != null && name != null && name.isNotEmpty) {
+        buffer.writeln('$role: $name');
+      }
+    }
+
+    return buffer.toString().trim();
+  }
 
   @override
   void initState() {
@@ -75,7 +99,7 @@ class _ShowFullPageState extends State<ShowFullPage>
               ),
               child: FlexibleSpaceBar(
                 title: Text(
-                  widget.caseNo,
+                  stripHtmlTags(widget.caseNo),
                   style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 16,
@@ -108,87 +132,28 @@ class _ShowFullPageState extends State<ShowFullPage>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Case Information Card
-                    Card(
-                      elevation: 8,
-                      shadowColor: Colors.indigo.withOpacity(0.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [Colors.white, Colors.indigo.shade50],
-                          ),
+                    _buildSectionCard(
+                      icon: Icons.gavel,
+                      title: 'Case Information',
+                      children: [
+                        _buildInfoRow(
+                          'Case Number',
+                          stripHtmlTags(widget.caseNo),
+                          Icons.tag,
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(24.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      color: Colors.indigo.shade100,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Icon(
-                                      Icons.gavel,
-                                      color: Colors.indigo.shade700,
-                                      size: 20,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Case Information',
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.indigo.shade800,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 20),
-                              _buildInfoRow(
-                                'Case Number',
-                                widget.caseNo,
-                                Icons.tag,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildInfoRow(
-                                'Parties',
-                                widget.parties,
-                                Icons.people,
-                              ),
-                              const SizedBox(height: 16),
-                              _buildInfoRow(
-                                'Judge',
-                                widget.judge,
-                                Icons.person,
-                              ),
-                            ],
-                          ),
+                        _buildInfoRow(
+                          'Parties',
+                          stripHtmlTags(cleanPartiesF(widget.parties)),
+                          Icons.people,
                         ),
-                      ),
+                        _buildInfoRow(
+                          'Judge',
+                          stripHtmlTags(widget.judge),
+                          Icons.person,
+                        ),
+                      ],
                     ),
-
                     const SizedBox(height: 24),
-
-                    // Text Scale Controls
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -238,39 +203,20 @@ class _ShowFullPageState extends State<ShowFullPage>
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 16),
-
-                    // Full Text Card
-                    Card(
-                      elevation: 4,
-                      shadowColor: Colors.grey.withOpacity(0.1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(24.0),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.white,
-                          border: Border.all(
-                            color: Colors.grey.shade200,
-                            width: 1,
-                          ),
-                        ),
-                        child: SelectableText(
-                          widget.fullText,
-                          style: TextStyle(
-                            fontSize: 16 * _textScale,
-                            height: 1.6,
-                            color: Colors.black87,
-                            fontFamily: 'Georgia',
-                          ),
+                    _buildSectionCard(
+                      icon: Icons.description,
+                      title: 'Judgment Text',
+                      child: SelectableText(
+                        stripHtmlTags(widget.fullText),
+                        style: TextStyle(
+                          fontSize: 16 * _textScale,
+                          height: 1.6,
+                          color: Colors.black87,
+                          fontFamily: 'Georgia',
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 32),
                   ],
                 ),
@@ -283,36 +229,94 @@ class _ShowFullPageState extends State<ShowFullPage>
   }
 
   Widget _buildInfoRow(String label, String value, IconData icon) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Icon(icon, size: 18, color: Colors.indigo.shade600),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.grey.shade700,
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: Colors.indigo.shade600),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.grey.shade700,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black87,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionCard({
+    required IconData icon,
+    required String title,
+    List<Widget>? children,
+    Widget? child,
+  }) {
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24.0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.indigo.shade50],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
         ),
-      ],
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.indigo.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(icon, color: Colors.indigo.shade700, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.indigo.shade800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            if (children != null) ...children,
+            if (child != null) child,
+          ],
+        ),
+      ),
     );
   }
 }

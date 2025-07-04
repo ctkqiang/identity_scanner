@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle.dark,
       child: MaterialApp(
-        title: 'eJudgment Scanner',
+        title: 'Malaysia eJudgment',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.indigo,

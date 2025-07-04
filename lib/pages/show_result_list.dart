@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:html/parser.dart';
 import 'package:identity_scanner/controller/get.controller.dart';
 import 'package:identity_scanner/models/ejudgmentresponse.models.dart';
 import 'package:identity_scanner/models/search_item.models.dart';
@@ -20,6 +21,10 @@ class _ResultListPageState extends State<ResultListPage> {
   String _filterCourtLevel = 'All';
   bool _showDefamationOnly = false;
   bool _showCorruptionOnly = false;
+
+  String stripHtmlTags(String htmlString) {
+    return parse(htmlString).documentElement?.text.trim() ?? '';
+  }
 
   void openUrl(String url) async {
     final uri = Uri.parse(url);
@@ -276,7 +281,7 @@ class _ResultListPageState extends State<ResultListPage> {
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
-            Text(item.keyWord),
+            Text(stripHtmlTags(item.keyWord)),
             const SizedBox(height: 12),
           ],
 
