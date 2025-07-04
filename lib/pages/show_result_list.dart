@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:identity_scanner/controller/get.controller.dart';
 import 'package:identity_scanner/models/ejudgmentresponse.models.dart';
 import 'package:identity_scanner/models/search_item.models.dart';
+import 'package:identity_scanner/pages/show_file.dart';
+import 'package:identity_scanner/pages/show_full.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ResultListPage extends StatefulWidget {
   final EJudgmentResponse searchResult;
@@ -16,6 +20,34 @@ class _ResultListPageState extends State<ResultListPage> {
   String _filterCourtLevel = 'All';
   bool _showDefamationOnly = false;
   bool _showCorruptionOnly = false;
+
+  void openUrl(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw '❌ Could not launch $url';
+    }
+  }
+
+  String cleanPartiesF(String text) {
+    final pattern = RegExp(
+      r'(PLAINTIF|DEFENDAN|PERAYU|RESPONDEN|PEMOHON)(.*?)(?=PLAINTIF|DEFENDAN|PERAYU|RESPONDEN|PEMOHON|$)',
+      caseSensitive: false,
+    );
+
+    final buffer = StringBuffer();
+
+    for (final match in pattern.allMatches(text)) {
+      final role = match.group(1)?.toUpperCase();
+      final name = match.group(2)?.trim();
+      if (role != null && name != null && name.isNotEmpty) {
+        buffer.writeln('$role: $name');
+      }
+    }
+
+    return buffer.toString().trim();
+  }
 
   @override
   void initState() {
@@ -60,9 +92,7 @@ class _ResultListPageState extends State<ResultListPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list),
-            onPressed: () {
-              _showFilterDialog();
-            },
+            onPressed: _showFilterDialog,
           ),
         ],
       ),
@@ -89,26 +119,29 @@ class _ResultListPageState extends State<ResultListPage> {
               ],
             ),
           ),
-          
+
           // 筛选标签显示
-          if (_filterCourtLevel != 'All' || _showDefamationOnly || _showCorruptionOnly)
+          if (_filterCourtLevel != 'All' ||
+              _showDefamationOnly ||
+              _showCorruptionOnly)
             Container(
               color: Colors.grey.shade100,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 children: [
-                  const Text('Filters: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Filters: ',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(width: 8),
                   if (_filterCourtLevel != 'All')
                     _buildFilterChip(_filterCourtLevel),
-                  if (_showDefamationOnly)
-                    _buildFilterChip('Defamation'),
-                  if (_showCorruptionOnly)
-                    _buildFilterChip('Corruption'),
+                  if (_showDefamationOnly) _buildFilterChip('Defamation'),
+                  if (_showCorruptionOnly) _buildFilterChip('Corruption'),
                 ],
               ),
             ),
-          
+
           // 结果列表
           Expanded(
             child: _filteredResults.isEmpty
@@ -159,7 +192,7 @@ class _ResultListPageState extends State<ResultListPage> {
     final cleanCaseNo = item.cleanCaseNo;
     final cleanParties = item.cleanParties;
     final cleanJudges = item.cleanCorumJudge;
-    
+
     // 格式化日期
     final dateOfResult = item.parsedDateOfResult != null
         ? '${item.parsedDateOfResult!.day}/${item.parsedDateOfResult!.month}/${item.parsedDateOfResult!.year}'
@@ -192,25 +225,25 @@ class _ResultListPageState extends State<ResultListPage> {
                 ),
               ),
             ),
+
             const SizedBox(height: 8),
-            
+
             // 案件编号
             Text(
               cleanCaseNo,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
             ),
-            const SizedBox(height: 4),
-            
+            const SizedBox(height: 13),
+
             // 当事人信息
             Text(
-              cleanParties,
+              cleanPartiesF(cleanParties),
               style: const TextStyle(fontSize: 14),
-              maxLines: 2,
+              maxLines: 10,
               overflow: TextOverflow.ellipsis,
             ),
+
+            const SizedBox(height: 13),
           ],
         ),
         subtitle: Padding(
@@ -219,10 +252,7 @@ class _ResultListPageState extends State<ResultListPage> {
             children: [
               const Icon(Icons.calendar_today, size: 14, color: Colors.grey),
               const SizedBox(width: 4),
-              Text(
-                dateOfResult,
-                style: const TextStyle(fontSize: 12),
-              ),
+              Text(dateOfResult, style: const TextStyle(fontSize: 12)),
               const SizedBox(width: 16),
               const Icon(Icons.gavel, size: 14, color: Colors.grey),
               const SizedBox(width: 4),
@@ -240,7 +270,7 @@ class _ResultListPageState extends State<ResultListPage> {
         children: [
           const Divider(),
           // 案件关键词
-          if (item.keyWord.isNotEmpty) ...[  
+          if (item.keyWord.isNotEmpty) ...[
             const Text(
               'Keywords:',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -249,9 +279,9 @@ class _ResultListPageState extends State<ResultListPage> {
             Text(item.keyWord),
             const SizedBox(height: 12),
           ],
-          
+
           // 法官信息
-          if (cleanJudges.isNotEmpty) ...[  
+          if (cleanJudges.isNotEmpty) ...[
             const Text(
               'Judges:',
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -260,55 +290,79 @@ class _ResultListPageState extends State<ResultListPage> {
             Text(cleanJudges),
             const SizedBox(height: 12),
           ],
-          
+
           // 相关文档
-          if (item.listOfAPDoc.isNotEmpty) ...[  
+          if (item.listOfAPDoc.isNotEmpty) ...[
             const Text(
               'Related Documents:',
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            ...item.listOfAPDoc.map((doc) => Padding(
-              padding: const EdgeInsets.only(bottom: 4),
-              child: Row(
-                children: [
-                  const Icon(Icons.description, size: 16, color: Colors.indigo),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      doc.apDocName,
-                      style: const TextStyle(
+            ...item.listOfAPDoc.map(
+              (doc) => GestureDetector(
+                onTap: () {
+                  EjudementService ejudementService = EjudementService();
+                  String url = ejudementService.openCaseDocument(
+                    doc.documentID,
+                  );
+
+                  openUrl(url);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.description,
+                        size: 16,
                         color: Colors.indigo,
-                        decoration: TextDecoration.underline,
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          doc.apDocName,
+                          style: const TextStyle(
+                            color: Colors.indigo,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            )),
+            ),
           ],
-          
+
           // 底部操作按钮
           const SizedBox(height: 16),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              OutlinedButton.icon(
-                icon: const Icon(Icons.share, size: 16),
-                label: const Text('Share'),
-                onPressed: () {
-                  // 分享功能实现
-                },
-              ),
+              // OutlinedButton.icon(
+              //   icon: const Icon(Icons.share, size: 16),
+              //   label: const Text('Share'),
+              //   onPressed: () {
+
+              //   },
+              // ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
                 icon: const Icon(Icons.visibility, size: 16),
                 label: const Text('View Full'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo),
                 onPressed: () {
-                  // 查看完整判决书功能实现
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ShowFullPage(
+                        caseNo: item.caseNo,
+                        parties: item.parties,
+                        judge: item.judge,
+                        fullText: item.keyWord,
+                      ),
+                    ),
+                  );
                 },
               ),
             ],
@@ -345,7 +399,10 @@ class _ResultListPageState extends State<ResultListPage> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Court Level', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Court Level',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -353,22 +410,35 @@ class _ResultListPageState extends State<ResultListPage> {
                       _buildFilterOption('All', _filterCourtLevel, (value) {
                         setDialogState(() => _filterCourtLevel = value);
                       }),
-                      _buildFilterOption('Mahkamah Persekutuan', _filterCourtLevel, (value) {
+                      _buildFilterOption(
+                        'Mahkamah Persekutuan',
+                        _filterCourtLevel,
+                        (value) {
+                          setDialogState(() => _filterCourtLevel = value);
+                        },
+                      ),
+                      _buildFilterOption('Mahkamah Rayuan', _filterCourtLevel, (
+                        value,
+                      ) {
                         setDialogState(() => _filterCourtLevel = value);
                       }),
-                      _buildFilterOption('Mahkamah Rayuan', _filterCourtLevel, (value) {
+                      _buildFilterOption('Mahkamah Tinggi', _filterCourtLevel, (
+                        value,
+                      ) {
                         setDialogState(() => _filterCourtLevel = value);
                       }),
-                      _buildFilterOption('Mahkamah Tinggi', _filterCourtLevel, (value) {
-                        setDialogState(() => _filterCourtLevel = value);
-                      }),
-                      _buildFilterOption('Mahkamah Sesyen', _filterCourtLevel, (value) {
+                      _buildFilterOption('Mahkamah Sesyen', _filterCourtLevel, (
+                        value,
+                      ) {
                         setDialogState(() => _filterCourtLevel = value);
                       }),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('Case Type', style: TextStyle(fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Case Type',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   const SizedBox(height: 8),
                   CheckboxListTile(
                     title: const Text('Defamation Cases'),
@@ -437,7 +507,11 @@ class _ResultListPageState extends State<ResultListPage> {
     );
   }
 
-  Widget _buildFilterOption(String label, String groupValue, Function(String) onSelected) {
+  Widget _buildFilterOption(
+    String label,
+    String groupValue,
+    Function(String) onSelected,
+  ) {
     final isSelected = label == groupValue;
     return ChoiceChip(
       label: Text(label),

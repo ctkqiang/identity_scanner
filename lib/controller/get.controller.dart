@@ -50,7 +50,7 @@ class EjudementService extends EJusgementLogic {
     String? dateOfResultTo,
     int currPage = 1,
     String ordering = 'DATE_OF_AP_DESC',
-    int maxRetries = 5,
+    int maxRetries = 3,
     int delayBetweenRetries = 3000,
   }) async {
     final url = Uri.parse('$baseUrl$searchEndpoint');
@@ -163,5 +163,10 @@ class EjudementService extends EJusgementLogic {
     // 此处实现Dio版本的请求
     // 如果需要，可以在后续添加
     throw UnimplementedError('Dio实现尚未完成');
+  }
+
+  @override
+  String openCaseDocument(String documentId) {
+    return "https://efs.kehakiman.gov.my/EFSWeb/DocDownloader.aspx?DocumentID=$documentId&Inline=true";
   }
 }

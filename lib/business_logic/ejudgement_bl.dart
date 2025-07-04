@@ -15,4 +15,6 @@ abstract class EJusgementLogic {
     int currPage = 1,
     String ordering = 'DATE_OF_AP_DESC',
   });
+
+  String openCaseDocument(String documentId);
 }

@@ -113,6 +113,8 @@ class _SearchPageState extends State<SearchPage>
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
+      extendBody: true,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('eJudgment Search'),
         centerTitle: true,
