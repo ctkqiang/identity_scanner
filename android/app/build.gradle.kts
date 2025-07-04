@@ -30,11 +30,23 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") { // Use 'create("name")' for Kotlin DSL
+            // IMPORTANT: These hardcoded values are for your current, rejected upload key.
+            // After the Google Play Console upload key reset, you will update these
+            // to reference your new, unique key.properties file.
+            storeFile = file("upload-keystore.jks")
+            storePassword = "1300177"
+            keyAlias = "upload"
+            keyPassword = "1300177"
+        }
+    }
+
     buildTypes {
-        release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+        getByName("release") { // Use 'getByName("name")' for existing build types
+            // This correctly applies the signing config defined above
+            signingConfig = signingConfigs.getByName("release")
+            // ... other release configurations if any
         }
     }
 }
