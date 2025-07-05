@@ -1,6 +1,8 @@
 import 'package:identity_scanner/models/ejudgmentresponse.models.dart';
+import 'package:identity_scanner/models/scanner_annotation.dart';
 
 abstract class EJusgementLogic {
+  @IdentityScanner(description: 'getEJudgmentPortalSearchList', param: 1)
   Future<EJudgmentResponse> getEJudgmentPortalSearchList({
     required String search,
     String jurisdictionType = 'ALL',
@@ -16,5 +18,6 @@ abstract class EJusgementLogic {
     String ordering = 'DATE_OF_AP_DESC',
   });
 
+  @IdentityScanner(description: 'openCaseDocument', param: 1)
   String openCaseDocument(String documentId);
 }
