@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:identity_scanner/business_logic/ejudgement_bl.dart';
 import 'package:identity_scanner/models/ejudgmentresponse.models.dart';
@@ -127,7 +128,9 @@ class EjudementService extends EJusgementLogic {
           lastException = Exception(
             '服务器错误，状态码: ${response.statusCode}，响应内容: ${response.body}，尝试重试...',
           );
-          print('请求失败(尝试 ${attempts + 1}/$maxRetries): $lastException');
+          if (kDebugMode) {
+            print('请求失败(尝试 ${attempts + 1}/$maxRetries): $lastException');
+          }
         } else {
           // 其他错误，直接抛出异常
           throw Exception(
@@ -137,7 +140,9 @@ class EjudementService extends EJusgementLogic {
       } catch (e) {
         // 捕获网络异常
         lastException = Exception('请求异常: $e');
-        print('请求异常(尝试 ${attempts + 1}/$maxRetries): $e');
+        if (kDebugMode) {
+          print('请求异常(尝试 ${attempts + 1}/$maxRetries): $e');
+        }
       }
 
       // 增加尝试次数
