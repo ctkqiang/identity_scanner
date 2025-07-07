@@ -1,3 +1,10 @@
+name: Release to GitHub
+
+on:
+  push:
+    tags:
+      - 'v*' # 推送版本 tag 触发
+
 jobs:
   release:
     runs-on: ubuntu-latest
