@@ -1,0 +1,22 @@
+default_platform(:android)
+
+platform :android do
+  desc "Build & upload release to GitHub"
+  lane :release_to_github do
+    gradle(
+      task: "bundle",
+      build_type: "Release"
+    )
+
+    aab_path = lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH]
+
+    github_release(
+      repository_name: "your_github_username/your_repo",
+      api_token: ENV["GITHUB_API_TOKEN"],
+      name: "v#{Time.now.strftime('%Y.%m.%d')}",
+      tag_name: "v#{Time.now.strftime('%Y.%m.%d')}",
+      description: "Automated release uploaded by fastlane",
+      upload_assets: [aab_path]
+    )
+  end
+end
