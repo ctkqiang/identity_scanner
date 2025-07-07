@@ -27,7 +27,7 @@ jobs:
 
       - name: Install Fastlane
         run: |
-          gem install bundler
+          gem install bundler --user-install
           bundle install
 
       - name: Upload AAB to GitHub Release
