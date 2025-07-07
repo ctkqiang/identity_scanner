@@ -3,11 +3,12 @@ name: Release to GitHub
 on:
   push:
     tags:
-      - 'v*' # 推送版本 tag 触发
+      - 'v*' # 只有打 tag（如 v1.0.0）时触发
 
 jobs:
   release:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v3
 
@@ -25,17 +26,24 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
 
-      - name: Install Fastlane
-        run: |
-          gem install bundler --user-install
-          bundle install
-
-      - name: Upload AAB to GitHub Release
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
         env:
-          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bundle exec fastlane release_to_github
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload APK to GitHub Release
+      - name: Upload AAB
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/bundle/release/app-release.aab
         env:
-          GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bundle exec fastlane release_to_github
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload APK
+        uses: softprops/action-gh-release@v1
+        with:
+          files: build/app/outputs/flutter-apk/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
