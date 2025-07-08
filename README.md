@@ -1,6 +1,14 @@
 # Malaysia EJudgement App
 
-[![Release to GitHub](https://github.com/ctkqiang/identity_scanner/actions/workflows/release.yml/badge.svg)](https://github.com/ctkqiang/identity_scanner/actions/workflows/release.yml)
+<p align="center">
+  <a href="https://github.com/ctkqiang/identity_scanner/actions/workflows/release.yml">
+    <img alt="GitHub Workflow Status" src="https://img.shields.io/github/actions/workflow/status/ctkqiang/identity_scanner/release.yml?label=Release%20Build&style=for-the-badge&logo=github&labelColor=1f1f1f&color=28a745">
+  </a>
+  &nbsp;
+  <a href="https://github.com/ctkqiang/identity_scanner/releases">
+    <img alt="Download APK" src="https://img.shields.io/badge/Download APK-28a745?style=for-the-badge&logo=android&logoColor=white">
+  </a>
+</p>
 
 ## 项目简介
 
@@ -85,6 +93,14 @@ identity_scanner/
 └── README.md            # 项目说明文档
 ```
 
+## 效果展示
+
+<p align="center">
+  <img src="assets/1.jpeg" width="30%" style="margin-right: 5px;" />
+  <img src="assets/2.jpeg" width="30%" style="margin-right: 5px;" />
+  <img src="assets/3.jpeg" width="30%" />
+</p>
+
 ## 贡献
 
 欢迎对本项目提出改进意见或贡献代码。请遵循以下步骤：
@@ -105,4 +121,4 @@ identity_scanner/
 
 ---
 
-**This app is built dedicated to Malaysian Court with Love, powered by their API.**
+> This app is built dedicated to Malaysian Court with Love, powered by their API
