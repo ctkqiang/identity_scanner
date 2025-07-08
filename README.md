@@ -44,7 +44,7 @@
 ### 克隆项目
 
 ```bash
-git clone https://github.com/your_username/identity_scanner.git
+git clone https://github.com/ctkqiang/identity_scanner.git
 cd identity_scanner
 ```
 
