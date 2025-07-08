@@ -35,9 +35,6 @@ android {
     signingConfigs {
         create("release") { 
             storeFile = file("upload-keystore.jks")
-            storePassword = "1300177"
-            keyAlias = "upload"
-            keyPassword = "1300177"
         }
     }
 
@@ -45,7 +42,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = null
 
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
