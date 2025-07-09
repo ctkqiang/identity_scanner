@@ -45,6 +45,11 @@
 
 ```bash
 git clone https://github.com/ctkqiang/identity_scanner.git
+or
+git clone https://gitcode.com/ctkqiang_sr/identity_scanner.git
+or
+git clone https://gitlab.com/ctkqiang/identity_scanner.git
+
 cd identity_scanner
 ```
 
