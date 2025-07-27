@@ -32,7 +32,7 @@
 - **JSON Serialization**：用于处理 API 返回的 JSON 数据。
 
 ## 测试
-<a href="https://appdistribution.firebase.google.com/testerapps/1:493984454334:android:f74f67220899bc367d30ef/releases/6o49huddignto?utm_source=firebase-console" target="_blank">
+<a href="https://appdistribution.firebase.dev/i/9079169dbdddb479" target="_blank">
     <img src="https://miro.medium.com/v2/resize:fit:822/1*bhsZT9dTPWvxj0wj7wrNQA.png" width="250px">
 </a>
 
