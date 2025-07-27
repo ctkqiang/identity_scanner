@@ -31,6 +31,11 @@
 - **HTTP/Dio**：用于网络请求，与后端 API 进行高效通信。
 - **JSON Serialization**：用于处理 API 返回的 JSON 数据。
 
+## 测试
+<a href="https://appdistribution.firebase.google.com/testerapps/1:493984454334:android:f74f67220899bc367d30ef/releases/6o49huddignto?utm_source=firebase-console" target="_blank">
+    <img src="https://miro.medium.com/v2/resize:fit:822/1*bhsZT9dTPWvxj0wj7wrNQA.png" width="250px">
+</a>
+
 ## 安装与运行
 
 ### 环境准备
