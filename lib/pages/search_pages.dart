@@ -108,10 +108,6 @@ class _SearchPageState extends State<SearchPage>
 
   @override
   Widget build(BuildContext context) {
-    // 获取屏幕尺寸
-    final screenSize = MediaQuery.of(context).size;
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
@@ -120,12 +116,12 @@ class _SearchPageState extends State<SearchPage>
         centerTitle: true,
         elevation: 0,
         backgroundColor: Colors.indigo,
+        bottomOpacity: 0.0,
+        bottom: null,
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              _showInfoDialog(context);
-            },
+            onPressed: () => _showInfoDialog(context),
           ),
         ],
       ),
@@ -143,7 +139,7 @@ class _SearchPageState extends State<SearchPage>
             child: SlideTransition(
               position: _slideAnimation,
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(20.0),
                 child: Form(
                   key: _formKey,
                   child: ListView(
@@ -422,7 +418,7 @@ class _SearchPageState extends State<SearchPage>
                         ),
                       ],
 
-                      const SizedBox(height: 100),
+                      const SizedBox(height: 120),
 
                       // 底部提示信息
                       Container(
@@ -440,7 +436,7 @@ class _SearchPageState extends State<SearchPage>
                                 ),
                                 SizedBox(width: 4),
                                 Text(
-                                  '2025 Malaysian eJugement | Built by ctkqiang',
+                                  '2025 Malaysian eJugement ',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.indigo,
@@ -452,7 +448,7 @@ class _SearchPageState extends State<SearchPage>
                             ),
                             SizedBox(width: 4),
                             Text(
-                              'This app is built dedicated to Malaysian Court with ❤️',
+                              'This app is built dedicated to \n Malaysian Court with ❤️ \n Built by 钟智强 ｜ ctkqiang',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 color: Colors.indigo,
